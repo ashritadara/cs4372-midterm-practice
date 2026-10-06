@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CS 4372 Midterm Practice</title>
+    <meta
+      name="description"
+      content="A local multiple-choice practice exam app for CS 4372 Machine Learning."
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231f2937'/%3E%3Cpath d='M14 42h36v6H14zM17 17h9v20h-9zM29 25h9v12h-9zM41 12h9v25h-9z' fill='%2338bdf8'/%3E%3Cpath d='M15 14l34 34' stroke='%23facc15' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Machine Learning Midterm</p>
+          <h1>CS 4372 Midterm Practice</h1>
+        </div>
+        <button class="icon-button" id="themeToggle" type="button" aria-label="Toggle dark mode">
+          <span aria-hidden="true">◐</span>
+        </button>
+      </header>
+
+      <main>
+        <section class="view active" id="homeView" aria-labelledby="homeTitle">
+          <div class="dashboard-grid">
+            <article class="panel hero-panel">
+              <h2 id="homeTitle">Practice Dashboard</h2>
+              <p>
+                Build a short exam from the bank, focus on weak areas, or revisit the
+                questions that have been giving you trouble.
+              </p>
+              <div class="metric-grid" id="summaryMetrics"></div>
+            </article>
+
+            <article class="panel">
+              <div class="section-heading">
+                <h2>Start Practice</h2>
+                <p id="poolHelp">Default exam: 25 random questions from the full bank.</p>
+              </div>
+
+              <form id="practiceForm" class="practice-form">
+                <fieldset>
+                  <legend>Number of Questions</legend>
+                  <div class="segmented" id="questionCountOptions">
+                    <label><input type="radio" name="questionCount" value="5" />5</label>
+                    <label><input type="radio" name="questionCount" value="10" />10</label>
+                    <label><input type="radio" name="questionCount" value="15" />15</label>
+                    <label><input type="radio" name="questionCount" value="20" />20</label>
+                    <label><input type="radio" name="questionCount" value="25" checked />25</label>
+                  </div>
+                  <label class="inline-field">
+                    Custom
+                    <input id="customCount" type="number" min="1" inputmode="numeric" placeholder="Optional" />
+                  </label>
+                </fieldset>
+
+                <fieldset>
+                  <legend>Question Pool</legend>
+                  <div class="radio-stack">
+                    <label><input type="radio" name="poolType" value="all" checked /> Entire Question Bank</label>
+                    <label><input type="radio" name="poolType" value="range" /> Custom question ID range</label>
+                  </div>
+                  <div class="range-row" id="rangeControls" aria-label="Custom question ID range">
+                    <label>From <input id="rangeFrom" type="number" min="1" inputmode="numeric" /></label>
+                    <label>To <input id="rangeTo" type="number" min="1" inputmode="numeric" /></label>
+                  </div>
+                </fieldset>
+
+                <fieldset>
+                  <legend>Topic Filters</legend>
+                  <div class="checkbox-grid" id="topicFilters"></div>
+                </fieldset>
+
+                <fieldset>
+                  <legend>Practice Mode</legend>
+                  <div class="mode-grid">
+                    <label><input type="radio" name="mode" value="random" checked /> Random</label>
+                    <label><input type="radio" name="mode" value="topic" /> By Topic</label>
+                    <label><input type="radio" name="mode" value="weak" /> Weak Topics</label>
+                    <label><input type="radio" name="mode" value="incorrect" /> Incorrect Questions</label>
+                  </div>
+                </fieldset>
+
+                <p class="form-message" id="formMessage" role="status"></p>
+                <button class="primary-button" type="submit">Start Practice</button>
+              </form>
+            </article>
+          </div>
+
+          <article class="panel stats-panel">
+            <div class="section-heading">
+              <h2>Statistics</h2>
+              <button class="danger-button" id="resetStats" type="button">Reset Statistics</button>
+            </div>
+            <div class="stats-grid" id="statsDetails"></div>
+          </article>
+        </section>
+
+        <section class="view" id="quizView" aria-live="polite">
+          <article class="panel quiz-panel">
+            <div class="quiz-topline">
+              <div>
+                <p class="eyebrow" id="questionCounter">Question 1 of 25</p>
+                <h2 id="questionText"></h2>
+              </div>
+              <div class="score-pill" id="currentScore">Score 0 / 0</div>
+            </div>
+            <div class="question-meta">
+              <span id="questionTopic"></span>
+              <span id="questionDifficulty"></span>
+            </div>
+            <div class="progress-track" aria-label="Quiz progress">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="choices" id="choiceList"></div>
+            <div class="feedback hidden" id="feedbackPanel"></div>
+            <div class="quiz-actions">
+              <button class="secondary-button" id="quitQuiz" type="button">Return Home</button>
+              <button class="primary-button" id="submitAnswer" type="button">Submit Answer</button>
+            </div>
+          </article>
+        </section>
+
+        <section class="view" id="resultsView" aria-labelledby="resultsTitle">
+          <article class="panel results-panel">
+            <p class="eyebrow">Practice Complete</p>
+            <h2 id="resultsTitle">Practice Complete</h2>
+            <div class="result-hero" id="resultHero"></div>
+            <div class="topic-results" id="topicResults"></div>
+            <div class="result-actions">
+              <button class="secondary-button" id="reviewIncorrect" type="button">Review Incorrect</button>
+              <button class="primary-button" id="newPractice" type="button">New Practice</button>
+              <button class="secondary-button" id="returnHome" type="button">Return Home</button>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>
